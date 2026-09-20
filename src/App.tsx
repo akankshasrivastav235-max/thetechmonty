@@ -1043,11 +1043,11 @@ export default function App(){
               <div className="bg-white rounded-[16px] border shadow-sm p-4">
                 <div className="text-xs font-semibold">Timer Cleanup - Bug Free</div>
                 <div className="mt-2 text-[11px] text-zinc-500 mono bg-zinc-50 border rounded-xl p-3">
-                
-          
-                  &nbsp;&nbsp;const t=setTimeout(()=>setTimeLeft(v=&gt;v-1),1000);<br/>
-                  &nbsp;&nbsp;return ()=&gt; clearTimeout(t);<br/>
-                  &#125;, [timeLeft])
+                useEffect(() => {
+  if (timeLeft <= 0) autoSubmit();
+  const t = setTimeout(() => setTimeLeft((v) => v - 1), 1000);
+  return () => clearTimeout(t);
+}, [timeLeft]);
                 </div>
               </div>
             </div>
