@@ -1,4 +1,4 @@
-name: Build AAB
+name: Build APK
 
 on:
   workflow_dispatch:
@@ -7,17 +7,24 @@ on:
       - main
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
 
       - name: Install dependencies
         run: npm install
@@ -25,27 +32,20 @@ jobs:
       - name: Build web app
         run: npm run build
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
       - name: Add Android platform
-        run: |
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
+        run: npx cap add android
 
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build Android App Bundle
-        working-directory: android
-        run: ./gradlew bundleRelease
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-      - name: Upload AAB
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: thetechmonty-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          name: thetechmonty-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
